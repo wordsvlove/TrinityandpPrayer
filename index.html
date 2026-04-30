@@ -36,7 +36,7 @@
 
     header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     header h1 {
@@ -51,7 +51,7 @@
       font-size: 15px;
     }
 
-    /* Content Area (Moved to Top) */
+    /* Content Area */
     .content-area {
       background-color: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -66,10 +66,39 @@
       color: var(--accent);
       font-size: 24px;
       margin-top: 0;
-      margin-bottom: 25px;
+      margin-bottom: 15px;
       text-align: center;
+    }
+
+    .tts-container {
+      text-align: center;
+      margin-bottom: 25px;
       border-bottom: 1px dashed var(--border-color);
-      padding-bottom: 15px;
+      padding-bottom: 20px;
+    }
+
+    .tts-btn {
+      background-color: var(--accent);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 15px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .tts-btn:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .tts-btn.playing {
+      background-color: #ef4444;
+      color: #fff;
     }
 
     .section-title {
@@ -100,6 +129,7 @@
       border-radius: 8px;
       border-left: 3px solid var(--accent);
       font-size: 16px;
+      margin-bottom: 10px;
     }
 
     .text-block {
@@ -133,7 +163,7 @@
       padding-top: 10px;
     }
 
-    /* Calendar Grid (Moved to Bottom) */
+    /* Calendar Grid */
     .calendar-container {
       background-color: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -209,13 +239,22 @@
       <p>尋源三一真神・活出主禱生命</p>
     </header>
 
-    <!-- Content Area moved to top -->
     <div id="content-area" class="content-area">
       <h2 id="view-title" class="day-title"></h2>
       
-      <div class="section-title">完整聖經經文（和合本）</div>
+      <div class="tts-container">
+        <button id="tts-btn" class="tts-btn" onclick="toggleAudio()">
+          <svg id="tts-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          <span id="play-btn-text">聆聽靈修內容</span>
+        </button>
+      </div>
+      
+      <div class="section-title">經文</div>
       <div id="view-bible" class="bible-text"></div>
       
+      <div class="section-title" id="extra-bible-title" style="display: none;">默想經文</div>
+      <div id="view-extra-bible" class="bible-text" style="display: none;"></div>
+
       <div class="section-title">聖言反思</div>
       <div id="view-reflection" class="text-block"></div>
 
@@ -235,7 +274,6 @@
       載入中，請稍候...
     </div>
 
-    <!-- Calendar moved to bottom -->
     <div class="calendar-container">
       <div class="calendar-header">
         <span style="font-weight: bold; color: var(--accent);">往日回顧與選擇</span>
@@ -249,7 +287,7 @@
   </div>
 
   <script>
-    // 靈修資料庫 (Day 1-15: 三一神學； Day 16-31: 主禱文)
+    // 靈修資料庫
     const devotionals = [
       {
         day: 1,
@@ -459,6 +497,7 @@
         day: 18,
         title: "Day 18：我們在天上的父",
         bible: "馬太福音 6:9a「所以，你們禱告要這樣說：我們在天上的父...」",
+        extraBible: "羅馬書 8:15「你們所受的，不是奴僕的心，仍舊害怕；所受的，乃是兒子的心，因此我們呼叫：『阿爸！父！』」",
         reflection: "這是主禱文的基石。「父啊 (Abba)」是極度親密的呼喚，宣告我們不再是奴僕，而是兒女。但耶穌同時加上「在天上」，這在猶太傳統中代表上帝的絕對主權、超越性與全能。這位愛我們入骨的天父，同時也是掌管宇宙的主宰。此外，這是「我們」的父，提醒我們信仰永遠具有群體性。",
         observation: "許多人因為原生家庭的傷害，對「父親」這個角色感到恐懼。但天上的父是完美、不求回報的。祂醫治我們對權威的恐懼，賜給我們無條件的接納。同時，「我們」這兩個字提醒你，在信仰的路上你並非獨行，你被納入了一個屬靈的大家庭，與弟兄姊妹互為肢體。",
         meditation: [
@@ -471,6 +510,7 @@
         day: 19,
         title: "Day 19：尊祢的名為聖",
         bible: "馬太福音 6:9b「...願人都尊你的名為聖。」",
+        extraBible: "以西結書 36:23「我要使我的大名顯為聖；這名在列國中已被褻瀆，就是你們在他們中間所褻瀆的。」",
         reflection: "上帝的名字代表著祂的本質與榮耀。「尊為聖 (hagiazo)」意即將其分別為聖。這是一個末世性的祈求，我們渴望上帝親自介入歷史，彰顯祂的聖潔，讓世人不再褻瀆祂的名。同時，這也要求屬神的子民，在生活中活出與這聖名相稱的品格，成為反照上帝榮耀的器皿。",
         observation: "在一個充滿妥協與相對主義的世代，上帝的名常被忽視，甚至因為基督徒的虛偽而蒙羞。若我們的生命充滿嫉妒、紛爭和自私，我們如何能讓世界尊主的名為聖？這個禱告是一個深刻的自我省察。求聖靈潔淨我們的心思意念，讓我們的生活方式與職業操守，都成為上帝聖潔的倒影。",
         meditation: [
@@ -483,6 +523,7 @@
         day: 20,
         title: "Day 20：願祢的國降臨",
         bible: "馬太福音 6:10a「願你的國降臨...」",
+        extraBible: "啟示錄 11:15「世上的國成了我主和主基督的國；他要作王，直到永永遠遠。」",
         reflection: "「神的國」不是一個地理區域，而是上帝的主權、統治與拯救的彰顯。當我們呼求「願祢的國降臨」時，我們是在熱切期盼基督再來時，那完全的和平與公義最終消滅一切罪惡。同時，這也是邀請上帝那「顛覆性」的統治法則——以服侍代替掌控，以饒恕代替報復——此時此刻就介入我們的世界。",
         observation: "地上的國度講求權力、財富和踩著別人上位，我們很容易被這種文化同化。但祈求神的國降臨，意味著我們不向這個敗壞的世界妥協，並願意讓上帝來統治我們的心。這是一場日常的屬靈革命：每一次你選擇用愛去回應仇恨，用誠實代替欺騙，天國就真實地降臨在那裡了。",
         meditation: [
@@ -495,6 +536,7 @@
         day: 21,
         title: "Day 21：願祢的旨意行",
         bible: "馬太福音 6:10b「...願你的旨意行在地上，如同行在天上。」",
+        extraBible: "詩篇 40:8「我的神啊，我樂意照你的旨意行；你的律法在我心裏。」",
         reflection: "在天上，上帝的旨意是毫無攔阻、完全成就的。耶穌在客西馬尼園親自示範了這個禱告：「不要照我的意思，只要照你的意思」。祈求「願祢的旨意行」，是承認人類的計劃往往充滿短視與自私，而上帝的旨意才是至善、純全的。這是信心的最高表現，表明我們願意完全降服於祂的主權。",
         observation: "我們內心深處往往更想說：「願我的旨意行在天上，求神配合我。」我們害怕交出主權，擔心上帝的安排會讓我們吃虧或受苦。但緊抓不放只會帶來極大的焦慮。上帝的旨意從來不是為了摧毀你。今天，嘗試勇敢地鬆開緊握的雙手，這不是無奈的認命，而是安息在天父那美好的計劃中。",
         meditation: [
@@ -507,6 +549,7 @@
         day: 22,
         title: "Day 22：如同行在天上",
         bible: "馬太福音 6:10c「...如同行在天上。」",
+        extraBible: "詩篇 103:20「聽從他命令、成全他旨意、有大能的天使，都要稱頌耶和華！」",
         reflection: "這是前三個祈求的總結。天上的實況是完全的順服、敬拜與和諧。耶穌教導我們將這幅天上的完美藍圖，拉到滿目瘡痍的地上。我們不該對地上的不公義、苦難與罪惡感到麻木，而是要成為上帝旨意在地上的代理人，讓地上的生活逐漸反映出天上的神聖秩序。",
         observation: "面對社會的不公義、職場的剝削或人際的撕裂，我們很容易感到無奈，甚至習慣了妥協，認為「現實就是這樣」。但這個禱告拒絕麻木。每一次你抵擋試探、每一次你選擇扶助弱小、每一次你尋求和睦，你都在讓天上的一束光，照進這片大地。你的生活，可以成為天堂在地上的微小倒影。",
         meditation: [
@@ -519,6 +562,7 @@
         day: 23,
         title: "Day 23：日用的飲食",
         bible: "馬太福音 6:11「我們日用的飲食，今日賜給我們。」",
+        extraBible: "箴言 30:8「求你使虛假和謊言遠離我；使我也不貧窮也不富足，賜給我需用的飲食。」",
         reflection: "學者指出，「日用 (epiousios)」這個罕見的希臘字，有「明天」或「未來」的含意。耶穌不僅是叫我們求物質的糧食，更是求那「未來末世天國筵席的豐盛，今日就賜給我們」。這提醒我們，生命中一切的供應，無論是麵包還是靈命的飽足，都是上帝神聖的餽贈，我們全然仰賴天父的恩典。",
         observation: "我們常把每日的健康與薪水，視為自己勞碌得來的理所當然，甚至陷入無盡的貪婪。但這句禱告徹底改變了我們的眼光：我們所領受的一切，都是天父的恩典。同時，祈求「今日」的飲食，教導我們放下對明天的過度擔憂。當你專注於今天的恩典，並深信神明天依然信實，你就能從焦慮中被釋放。",
         meditation: [
@@ -531,6 +575,7 @@
         day: 24,
         title: "Day 24：免我們的債",
         bible: "馬太福音 6:12a「免我們的債...」",
+        extraBible: "歌羅西書 2:13-14「神赦免了你們一切過犯... 又塗抹了在律例上所寫、攻擊我們、有礙於我們的字據，把它撤去，釘在十字架上。」",
         reflection: "在猶太背景中，「債 (opheilema)」是罪的隱喻。我們在上帝面前是徹底破產的債務人，根本無力償還因得罪神而欠下的罪債。這個祈求讓我們直面自己靈性上的貧窮。我們能呼求「免去」，完全是基於十字架上耶穌基督已經為我們付清了贖價。赦免從來不是廉價的，它是上帝極重無比的恩典。",
         observation: "我們有時對自己的罪感到麻木，覺得「反正祈個禱就沒事了」。但當我們輕看恩典的代價時，就容易在罪中打滾；或者相反，我們陷入深深的自我控告，覺得神不可能原諒我。這個禱告帶我們回到中道：承認自己的破敗，同時帶著敬畏與感恩的心，坦然無懼地領受天父那不離不棄的赦免。",
         meditation: [
@@ -543,6 +588,7 @@
         day: 25,
         title: "Day 25：如同我們免了人的債",
         bible: "馬太福音 6:12b「...如同我們免了人的債。」",
+        extraBible: "以弗所書 4:32「並要以恩慈相待，存憐憫的心，彼此饒恕，正如神在基督裏饒恕了你們一樣。」",
         reflection: "耶穌將我們領受神的赦免，與我們饒恕他人緊緊扣連。這並非指我們要靠「饒恕別人」來「賺取」上帝的饒恕，而是指出一個屬靈的因果關係：一顆被仇恨與苦毒封閉的心，是無法真正領受並經歷神敞開的恩典的。一個真正明白自己蒙了何等大恩的人，必然會將這份恩典流露給得罪他的人。",
         observation: "饒恕是信仰中最艱難的功課之一。我們內心可能都有咬牙切齒、不肯原諒的人。不肯饒恕就像自己喝下毒藥，怨恨會毒害我們的心靈。饒恕不是肯定對方的錯誤，也不是立刻恢復信任，而是將審判的主權交還給神，放過自己。求聖靈將十架的愛澆灌你，賜你願意尋求醫治與放手的意願。",
         meditation: [
@@ -555,6 +601,7 @@
         day: 26,
         title: "Day 26：不叫我們遇見試探",
         bible: "馬太福音 6:13a「不叫我們遇見試探...」",
+        extraBible: "哥林多前書 10:13「你們所遇見的試探，無非是人所能受的。神是信實的，必不叫你們受試探過於所能受的...」",
         reflection: "「試探 (peirasmos)」在此不僅指日常的道德誘惑，更指向末世那種會摧毀我們信心、讓我們背棄上帝的極大考驗 (Eschatological trial)。上帝不試探人犯罪，這句禱告是一個極度謙卑的宣告：我們承認自己本性軟弱，無力獨自面對撒旦的猛烈攻擊與信仰的嚴峻考驗，我們懇求天父的保護與引導。",
         observation: "我們有時對自己的屬靈生命過於自信，覺得「我絕對不會跌倒」，以至於疏忽了警醒。耶穌在客西馬尼園教導門徒「總要警醒禱告」，門徒卻睡著了。不要自視過高。在充滿誘惑與壓力的世界中，承認自己的軟弱，每天祈求天父保守我們的心懷意念，緊緊抓住祂的手，才是最安全的策略。",
         meditation: [
@@ -567,6 +614,7 @@
         day: 27,
         title: "Day 27：救我們脫離凶惡",
         bible: "馬太福音 6:13b「...救我們脫離凶惡（或作：惡者）。」",
+        extraBible: "提摩太後書 4:18「主必救我脫離諸般的凶惡，也必救我進他的天國。願榮耀歸給他，直到永永遠遠。阿們。」",
         reflection: "「凶惡」的原文可譯為「惡者 (The Evil One)」。這提醒我們，基督徒生活在一場真實的屬靈爭戰中。惡者撒旦的目標是破壞上帝的作為，撕裂我們與神、與人的關係。當我們深陷罪惡或絕望的泥沼時，我們無法自救。呼求「救我們」，是仰望那位在十字架上已經徹底擊敗死權與惡者的基督。",
         observation: "你生命中有沒有哪一個軟弱、成癮或負面情緒，是你覺得被深深綑綁、無法逃脫的？我們越是靠自己的血氣去掙扎，往往陷得越深。今天，停止無謂的自我控告與徒勞的掙扎，大聲宣告耶穌基督已經得勝！讓聖靈大能的手，親自將你從黑暗的權勢與謊言中奪回，賜你真正的自由。",
         meditation: [
@@ -579,6 +627,7 @@
         day: 28,
         title: "Day 28：國度全是祢的",
         bible: "馬太福音 6:13c「因為國度... 全是你的，直到永遠。」",
+        extraBible: "詩篇 145:13「你的國是永遠的國！你執掌的權柄存到萬代！」",
         reflection: "主禱文的結尾傳統上是一段榮耀的頌讚 (Doxology)。「國度全是祢的」宣告了宇宙的最終歸屬。地上雖然有各種政權、意識形態與金錢帝國在爭奪統治權，甚至惡者似乎暫時得勢，但這一切終將過去。唯有上帝的國度是永遠長存的。這是我們在動盪世代中，能夠安穩度日的終極確據。",
         observation: "每一天，這世界都在用各種方式向我們招手，試圖讓我們成為金錢、地位或虛榮的臣民。我們不知不覺將時間與精力投入建造必朽壞的「自我國度」。這句頌讚呼喚我們重新校準人生的方向標。認清誰才是真正的君王，將生命的主權交還給祂，投資在具有永恆價值的事物上。",
         meditation: [
@@ -591,6 +640,7 @@
         day: 29,
         title: "Day 29：權柄全是祢的",
         bible: "馬太福音 6:13c「...權柄... 全是你的，直到永遠。」",
+        extraBible: "啟示錄 12:10「...我神的救恩、能力、國度，並他基督的權柄，現在都來到了...」",
         reflection: "「權柄 (Power)」原文指大能。在祈求了日用飲食、赦免與拯救之後，我們宣告上帝擁有成就這一切的絕對能力。我們的禱告不是對著虛空發出的願望，而是投靠在一位全能的創造主身上。無論我們面對的罪債有多深、試探有多大，上帝的權柄與大能都足以拯救到底。",
         observation: "面對無法改變的環境、難以治癒的疾病或破裂的關係，我們常感到深深的無力感。我們覺得問題太大，大到連神都無能為力。但「權柄全是祢的」是一個信心的宣告。當你覺得自己已經到了盡頭，請記住，這正是上帝大能開始彰顯的起點。將你無力解決的重擔，交給這位大有能力的主。",
         meditation: [
@@ -603,6 +653,7 @@
         day: 30,
         title: "Day 30：榮耀全是祢的",
         bible: "馬太福音 6:13c「...榮耀，全是你的，直到永遠。」",
+        extraBible: "詩篇 115:1「耶和華啊，榮耀不要歸與我們，不要歸與我們；要因你的慈愛和誠實歸在你的名下！」",
         reflection: "「榮耀 (Glory)」指上帝本質的完全彰顯，是配得一切讚美與尊崇的。受造之物的最高目的，就是榮耀神並以祂為樂。主禱文從「願人都尊祢的名為聖」開始，以「榮耀全是祢的」結束，首尾呼應。這提醒我們，禱告的最終目的不是為了滿足我們的私慾，而是為了讓上帝的榮耀在我們生命中彰顯。",
         observation: "我們常常在事奉、工作或人際關係中，暗暗地尋求自己的榮耀，渴望被看見、被讚美。當別人搶了我們的風頭時，我們會感到失落或嫉妒。這句禱告是一帖解毒劑。當我們真心承認一切的榮耀都單單屬於神時，我們就能從「自我中心」的重擔中釋放出來，享受單純服侍的喜樂。",
         meditation: [
@@ -615,6 +666,7 @@
         day: 31,
         title: "Day 31：直到永遠，阿們",
         bible: "馬太福音 6:13c「...直到永遠。阿們！」",
+        extraBible: "猶大書 1:25「願榮耀、威嚴、能力、權柄，因我們的主耶穌基督歸與他，從萬古以前並現今，直到永永遠遠。阿們。」",
         reflection: "「阿們 (Amen)」源於希伯來文，意思是「真實的、誠心所願、必然成就」。這不僅是禱告的結束語，更是一個充滿信心的印記。我們深信，這31天裡我們所默想的關於上帝的愛、供應、赦免與拯救，在基督裡都是真實不變的。上帝的國度、權柄與榮耀不受時間限制，「直到永遠」是我們盼望的終極保障。",
         observation: "這31天的旅程即將結束，但活出《主禱文》的生命才剛剛開始。每一句「阿們」，都是你對上帝信實的阿們，也是你立志跟隨祂的阿們。今天，不管你是疲憊、受傷還是迷茫，將你的全人交託給這位信實的主。帶著「阿們」的確據，勇敢地走進你的日常生活中，成為天國在人間的見證。",
         meditation: [
@@ -626,8 +678,83 @@
     ];
 
     const state = {
-      selectedDay: 1
+      selectedDay: 1,
+      utterance: null
     };
+
+    // 取得廣東話女聲（優先尋找「海兒/HiuGa」）
+    function getCantoneseVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      // 1. 首選 Microsoft HiuGa (海兒) 或明確為 zh-HK 的女聲
+      let voice = voices.find(v => v.lang === 'zh-HK' && (v.name.includes('HiuGa') || v.name.includes('海兒')));
+      // 2. 次選 Apple 語音 (Sin-Ji 等) 
+      if (!voice) voice = voices.find(v => v.lang === 'zh-HK' && (v.name.includes('Sin-Ji') || v.name.includes('Sinji') || v.name.includes('Female')));
+      // 3. 備選任何 zh-HK 語音
+      if (!voice) voice = voices.find(v => v.lang === 'zh-HK');
+      // 4. 最後備選任何中文語音
+      if (!voice) voice = voices.find(v => v.lang.startsWith('zh'));
+      return voice;
+    }
+
+    // 確保語音庫載入
+    if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = getCantoneseVoice;
+    }
+
+    function toggleAudio() {
+      const btn = document.getElementById('tts-btn');
+      const btnText = document.getElementById('play-btn-text');
+
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        btn.classList.remove('playing');
+        btnText.innerText = '聆聽靈修內容';
+        return;
+      }
+
+      const data = devotionals.find(d => d.day === state.selectedDay);
+      if (!data) return;
+
+      // 清除聖經章節名稱，僅保留「」內的經文
+      const extractQuote = (str) => {
+        const idx = str.indexOf('「');
+        return idx !== -1 ? str.substring(idx) : str;
+      };
+
+      const title = data.title.replace(/Day \d+：/, '');
+      let textToRead = `${title}。\n`;
+      textToRead += `經文：${extractQuote(data.bible)}\n`;
+      if (data.extraBible) {
+        textToRead += `相關經文：${extractQuote(data.extraBible)}\n`;
+      }
+      textToRead += `聖言反思：${data.reflection}\n`;
+      textToRead += `心靈觀照：${data.observation}\n`;
+      textToRead += `深度默想與實踐：\n`;
+      data.meditation.forEach((m, idx) => {
+        textToRead += `第${idx + 1}。${m}\n`;
+      });
+      textToRead += `結束禱告：${data.prayer}`;
+
+      state.utterance = new SpeechSynthesisUtterance(textToRead);
+      const voice = getCantoneseVoice();
+      if (voice) state.utterance.voice = voice;
+      state.utterance.lang = 'zh-HK';
+      state.utterance.rate = 0.95; 
+
+      state.utterance.onend = () => {
+        btn.classList.remove('playing');
+        btnText.innerText = '聆聽靈修內容';
+      };
+
+      state.utterance.onerror = () => {
+        btn.classList.remove('playing');
+        btnText.innerText = '聆聽靈修內容';
+      };
+
+      window.speechSynthesis.speak(state.utterance);
+      btn.classList.add('playing');
+      btnText.innerText = '停止聆聽';
+    }
 
     function initApp() {
       document.getElementById('empty-state').style.display = 'none';
@@ -654,7 +781,6 @@
         const btn = document.createElement('button');
         btn.className = `day-btn ${i === state.selectedDay ? 'active' : ''}`;
         
-        // Removed the "5月" text, kept it clean with just the number
         btn.innerHTML = `<span>${i}</span>`;
         btn.onclick = () => {
           state.selectedDay = i;
@@ -678,6 +804,13 @@
     }
 
     function showDevotional(dayIndex) {
+      // 切換日子時自動停止當前播放的語音
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        document.getElementById('tts-btn').classList.remove('playing');
+        document.getElementById('play-btn-text').innerText = '聆聽靈修內容';
+      }
+
       const contentArea = document.getElementById('content-area');
       const data = devotionals.find(d => d.day === dayIndex);
       
@@ -686,6 +819,18 @@
         
         document.getElementById('view-title').innerText = data.title;
         document.getElementById('view-bible').innerText = data.bible;
+
+        const extraBibleTitle = document.getElementById('extra-bible-title');
+        const extraBibleText = document.getElementById('view-extra-bible');
+        if (data.extraBible) {
+          extraBibleTitle.style.display = 'flex';
+          extraBibleText.style.display = 'block';
+          extraBibleText.innerText = data.extraBible;
+        } else {
+          extraBibleTitle.style.display = 'none';
+          extraBibleText.style.display = 'none';
+        }
+
         document.getElementById('view-reflection').innerText = data.reflection;
         document.getElementById('view-observation').innerText = data.observation;
         
@@ -699,7 +844,6 @@
         
         document.getElementById('view-prayer').innerText = data.prayer;
 
-        // Auto scroll to top of content when clicking a new day
         window.scrollTo({
           top: 0,
           behavior: 'smooth'
