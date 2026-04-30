@@ -32,11 +32,13 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      position: relative; /* For absolute positioning of export button */
     }
 
     header {
       text-align: center;
       margin-bottom: 20px;
+      padding-top: 20px;
     }
 
     header h1 {
@@ -49,6 +51,30 @@
     header p {
       color: var(--text-muted);
       font-size: 15px;
+      margin-bottom: 15px;
+    }
+
+    /* Export Button (Top Left & White) */
+    .export-btn-top {
+      position: absolute;
+      top: 25px;
+      left: 20px;
+      background-color: transparent;
+      color: #ffffff;
+      border: 1px solid #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .export-btn-top:hover {
+      background-color: rgba(255, 255, 255, 0.1);
     }
 
     /* Content Area */
@@ -163,6 +189,71 @@
       padding-top: 10px;
     }
 
+    /* Notes Area */
+    .notes-container {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .notes-textarea {
+      width: 100%;
+      height: 120px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 15px;
+      font-family: inherit;
+      font-size: 16px;
+      resize: vertical;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+
+    .notes-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .notes-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 15px;
+    }
+
+    .save-btn {
+      background-color: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .save-btn:hover {
+      background-color: var(--accent);
+      color: #000;
+    }
+
+    .save-status {
+      font-size: 14px;
+      color: #10b981; /* Green */
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .save-status.show {
+      opacity: 1;
+    }
+
     /* Calendar Grid */
     .calendar-container {
       background-color: var(--bg-card);
@@ -228,12 +319,28 @@
     @media (max-width: 600px) {
       .calendar-grid { grid-template-columns: repeat(5, 1fr); }
       .content-area { padding: 20px; }
+      .export-btn-top {
+        position: static;
+        margin: 0 auto 20px auto;
+        display: flex;
+        justify-content: center;
+        width: max-content;
+      }
+      header {
+        padding-top: 10px;
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="app-container">
+    <!-- 匯出備份按鈕 (左上角) -->
+    <button onclick="exportAllNotes()" class="export-btn-top">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      匯出所有筆記備份
+    </button>
+
     <header>
       <h1>5月靈修旅程</h1>
       <p>尋源三一真神・活出主禱生命</p>
@@ -268,6 +375,16 @@
       
       <div class="section-title">結束禱告</div>
       <div id="view-prayer" class="prayer-text"></div>
+
+      <!-- 個人筆記區塊 -->
+      <div class="section-title">個人靈修筆記</div>
+      <div class="notes-container">
+        <textarea id="view-notes" class="notes-textarea" placeholder="在這裡寫下你今天的感動、反思或禱告..."></textarea>
+        <div class="notes-actions">
+          <button id="save-notes-btn" class="save-btn" onclick="saveNotes()">儲存筆記</button>
+          <span id="save-status" class="save-status">已儲存在本機！</span>
+        </div>
+      </div>
     </div>
 
     <div id="empty-state" class="system-msg" style="display: none;">
@@ -682,21 +799,90 @@
       utterance: null
     };
 
-    // 取得廣東話女聲（優先尋找「海兒/HiuGa」）
+    // 匯出全部筆記為 TXT (包含完整靈修內容)
+    function exportAllNotes() {
+      let exportText = "【5月靈修旅程：三一本體與主禱文 - 完整筆記與內容備份】\n\n";
+      let hasNotes = false;
+
+      // 檢查是否所有日子都沒有筆記
+      for (let i = 1; i <= 31; i++) {
+        const note = localStorage.getItem('devotional_notes_day_' + i);
+        if (note && note.trim() !== '') {
+          hasNotes = true;
+          break;
+        }
+      }
+
+      // 無論是否有筆記，都匯出所有日子的靈修內容
+      for (let i = 1; i <= 31; i++) {
+        const note = localStorage.getItem('devotional_notes_day_' + i) || "（今日無筆記）";
+        const data = devotionals.find(d => d.day === i);
+        
+        exportText += `====================================\n`;
+        exportText += `${data.title}\n`;
+        exportText += `====================================\n`;
+        
+        exportText += `【經文】\n${data.bible}\n\n`;
+        if (data.extraBible) {
+          exportText += `【默想經文】\n${data.extraBible}\n\n`;
+        }
+        exportText += `【聖言反思】\n${data.reflection}\n\n`;
+        exportText += `【心靈觀照】\n${data.observation}\n\n`;
+        
+        exportText += `【深度默想與實踐】\n`;
+        data.meditation.forEach((m, idx) => {
+          exportText += `${idx + 1}. ${m}\n`;
+        });
+        
+        exportText += `\n【結束禱告】\n${data.prayer}\n\n`;
+        exportText += `------------------------------------\n`;
+        exportText += `【我的個人筆記】\n${note}\n`;
+        exportText += `====================================\n\n\n`;
+      }
+
+      // 產生 Blob 檔案並觸發下載
+      const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '5月靈修筆記與內容備份.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // 儲存筆記功能 (Local Save)
+    function saveNotes() {
+      const notesArea = document.getElementById('view-notes');
+      const statusText = document.getElementById('save-status');
+      
+      localStorage.setItem('devotional_notes_day_' + state.selectedDay, notesArea.value);
+      
+      statusText.classList.add('show');
+      
+      setTimeout(() => {
+        statusText.classList.remove('show');
+      }, 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const notesArea = document.getElementById('view-notes');
+      if (notesArea) {
+        notesArea.addEventListener('blur', saveNotes);
+      }
+    });
+
+    // 取得廣東話女聲
     function getCantoneseVoice() {
       const voices = window.speechSynthesis.getVoices();
-      // 1. 首選 Microsoft HiuGa (海兒) 或明確為 zh-HK 的女聲
       let voice = voices.find(v => v.lang === 'zh-HK' && (v.name.includes('HiuGa') || v.name.includes('海兒')));
-      // 2. 次選 Apple 語音 (Sin-Ji 等) 
       if (!voice) voice = voices.find(v => v.lang === 'zh-HK' && (v.name.includes('Sin-Ji') || v.name.includes('Sinji') || v.name.includes('Female')));
-      // 3. 備選任何 zh-HK 語音
       if (!voice) voice = voices.find(v => v.lang === 'zh-HK');
-      // 4. 最後備選任何中文語音
       if (!voice) voice = voices.find(v => v.lang.startsWith('zh'));
       return voice;
     }
 
-    // 確保語音庫載入
     if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
       speechSynthesis.onvoiceschanged = getCantoneseVoice;
     }
@@ -715,7 +901,6 @@
       const data = devotionals.find(d => d.day === state.selectedDay);
       if (!data) return;
 
-      // 清除聖經章節名稱，僅保留「」內的經文
       const extractQuote = (str) => {
         const idx = str.indexOf('「');
         return idx !== -1 ? str.substring(idx) : str;
@@ -804,7 +989,6 @@
     }
 
     function showDevotional(dayIndex) {
-      // 切換日子時自動停止當前播放的語音
       if (window.speechSynthesis && window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
         document.getElementById('tts-btn').classList.remove('playing');
@@ -843,6 +1027,11 @@
         });
         
         document.getElementById('view-prayer').innerText = data.prayer;
+
+        // 載入該日的個人筆記
+        const savedNotes = localStorage.getItem('devotional_notes_day_' + dayIndex) || '';
+        document.getElementById('view-notes').value = savedNotes;
+        document.getElementById('save-status').classList.remove('show');
 
         window.scrollTo({
           top: 0,
